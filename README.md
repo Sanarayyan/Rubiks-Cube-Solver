@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Rubik's Cube Solver
 
 A modern Rubik's Cube solver with **React frontend** and **Flutter backend**, featuring 3D visualization and advanced solving algorithms.
@@ -222,3 +223,6 @@ If you encounter any issues:
 - [ ] Mobile app version
 - [ ] Voice commands for solving
 - [ ] Multi-language support
+=======
+# rubiks_solver_suite_flutter
+>>>>>>> ed5be7bfefc4cf7de655dc9d55616e8cb073ddac
