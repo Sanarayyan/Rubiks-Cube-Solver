@@ -1,181 +1,181 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import '../providers/cube_provider.dart';
+import '../utils/app_colors.dart';
+import '../widgets/mesh_background.dart';
 import 'manual_input_screen.dart';
 import 'image_upload_screen.dart';
 import 'history_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late AnimationController _staggerController;
+  final List<Animation<double>> _tileAnimations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _staggerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    for (int i = 0; i < 4; i++) {
+      _tileAnimations.add(
+        Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(
+            parent: _staggerController,
+            curve: Interval(0.4 + (i * 0.1), 0.8 + (i * 0.1), curve: Curves.easeOutQuart),
+          ),
+        ),
+      );
+    }
+
+    _staggerController.forward();
+  }
+
+  @override
+  void dispose() {
+    _staggerController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rubik\'s Cube Solver'),
-        backgroundColor: Colors.blue.shade600,
-        foregroundColor: Colors.white,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade50,
-              Colors.indigo.shade100,
-            ],
-          ),
-        ),
+      body: MeshBackground(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 40),
+                
                 // Header
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+                FadeTransition(
+                  opacity: _staggerController,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.apps,
-                        size: 64,
-                        color: Colors.blue.shade600,
+                      Text(
+                        'Rubik\'s',
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          letterSpacing: -1,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Solver',
+                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w900,
+                              shadows: [
+                                Shadow(
+                                  color: AppColors.primary.withOpacity(0.5),
+                                  blurRadius: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                            ),
+                            child: const Text(
+                              'PRO',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Welcome to Rubik\'s Cube Solver',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800,
+                        'The most elegant way to solve your 3x3 cube.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Solve any 3x3 Rubik\'s cube with step-by-step instructions',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
                 
-                const SizedBox(height: 24),
+                const SizedBox(height: 48),
                 
-                // Main action buttons
+                // Actions Grid
                 Expanded(
                   child: GridView.count(
                     crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 0.85,
+                    physics: const BouncingScrollPhysics(),
                     children: [
-                      _buildActionCard(
-                        context,
-                        icon: Icons.edit,
+                      _buildAnimatedCard(
+                        0,
+                        icon: Icons.edit_note_rounded,
                         title: 'Manual Input',
-                        subtitle: 'Set colors manually',
-                        color: Colors.purple,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ManualInputScreen(),
-                            ),
-                          );
-                        },
+                        subtitle: 'Custom Setup',
+                        color: AppColors.primary,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ManualInputScreen())),
                       ),
-                      _buildActionCard(
-                        context,
-                        icon: Icons.camera_alt,
-                        title: 'Photo Upload',
-                        subtitle: 'Take a photo',
-                        color: Colors.green,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ImageUploadScreen(),
-                            ),
-                          );
-                        },
+                      _buildAnimatedCard(
+                        1,
+                        icon: Icons.camera_rounded,
+                        title: 'AI Camera',
+                        subtitle: 'Scan & Solve',
+                        color: AppColors.accent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ImageUploadScreen())),
                       ),
-                      _buildActionCard(
-                        context,
-                        icon: Icons.history,
+                      _buildAnimatedCard(
+                        2,
+                        icon: Icons.history_rounded,
                         title: 'History',
-                        subtitle: 'View past solutions',
-                        color: Colors.orange,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HistoryScreen(),
-                            ),
-                          );
-                        },
+                        subtitle: 'Past Solutions',
+                        color: AppColors.secondary,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryScreen())),
                       ),
-                      _buildActionCard(
-                        context,
-                        icon: Icons.help,
-                        title: 'Tutorial',
-                        subtitle: 'Learn how to solve',
-                        color: Colors.teal,
-                        onTap: () {
-                          _showTutorialDialog(context);
-                        },
+                      _buildAnimatedCard(
+                        3,
+                        icon: Icons.school_rounded,
+                        title: 'Learn',
+                        subtitle: 'Tutorials',
+                        color: Colors.amber,
+                        onTap: () => _showTutorialDialog(context),
                       ),
                     ],
                   ),
                 ),
                 
-                const SizedBox(height: 16),
+                // Bottom Solve Button Area
+                _buildQuickSolveSection(context),
                 
-                // Quick solve button
-                Consumer<CubeProvider>(
-                  builder: (context, cubeProvider, child) {
-                    return ElevatedButton.icon(
-                      onPressed: cubeProvider.solution != null
-                          ? () {
-                              // Navigate to solution screen
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Solution screen coming soon!'),
-                                ),
-                              );
-                            }
-                          : null,
-                      icon: const Icon(Icons.play_arrow),
-                      label: Text(
-                        cubeProvider.solution != null
-                            ? 'View Last Solution'
-                            : 'No Solution Available',
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade600,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -183,97 +183,246 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildActionCard(
-    BuildContext context, {
+
+  Widget _buildAnimatedCard(
+    int index, {
     required IconData icon,
     required String title,
     required String subtitle,
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: color,
+    return FadeTransition(
+      opacity: _tileAnimations[index],
+      child: Transform.translate(
+        offset: Offset(0, 20 * (1 - _tileAnimations[index].value)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Material(
+              color: Colors.white.withOpacity(0.05),
+              child: InkWell(
+                onTap: onTap,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.05),
+                        blurRadius: 20,
+                        spreadRadius: 0,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(icon, color: color, size: 28),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
-  
-  void _showTutorialDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('How to Use'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '1. Manual Input:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+
+  Widget _buildQuickSolveSection(BuildContext context) {
+    return Consumer<CubeProvider>(
+      builder: (context, cubeProvider, child) {
+        bool hasSolution = cubeProvider.solution != null;
+        
+        return FadeTransition(
+          opacity: _staggerController,
+          child: Transform.translate(
+            offset: Offset(0, 30 * (1 - _staggerController.value)),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              Text('• Tap on the colored squares to change colors\n• Set up your cube exactly as it looks\n• Tap "Solve Cube" to get the solution'),
-              SizedBox(height: 16),
-              Text(
-                '2. Photo Upload:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          hasSolution ? 'Ready to Solve' : 'No Active Session',
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          hasSolution 
+                            ? 'Continue with your last solution'
+                            : 'Setup your cube to begin',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: hasSolution ? () {
+                      // Solution view logic
+                    } : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: hasSolution ? AppColors.primary : AppColors.surfaceLight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: Icon(
+                      hasSolution ? Icons.play_arrow_rounded : Icons.lock_rounded,
+                      color: hasSolution ? AppColors.background : AppColors.textMuted,
+                    ),
+                  ),
+                ],
               ),
-              Text('• Take a clear photo of your cube\n• Make sure all faces are visible\n• The app will detect the colors automatically'),
-              SizedBox(height: 16),
-              Text(
-                '3. Follow the Solution:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text('• Hold the cube as instructed\n• Follow the moves step by step\n• Practice each move before moving to the next'),
-            ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Got it!'),
+        );
+      },
+    );
+  }
+
+  void _showTutorialDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) {
+        return Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.school_rounded, color: Colors.amber),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Getting Started',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTutorialStep('1', 'Input colors manually or use your camera.'),
+                  _buildTutorialStep('2', 'Our AI calculates the fastest solution path.'),
+                  _buildTutorialStep('3', 'Follow step-by-step 3D visual instructions.'),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Got it!'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.9, end: 1.0).animate(anim1),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTutorialStep(String number, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$number.',
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 15,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),

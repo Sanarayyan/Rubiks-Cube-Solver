@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cube_provider.dart';
-import '../models/cube_state.dart';
+import '../utils/app_colors.dart';
 
 class CubeGridWidget extends StatelessWidget {
   const CubeGridWidget({super.key});
@@ -10,24 +10,28 @@ class CubeGridWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<CubeProvider>(
       builder: (context, cubeProvider, child) {
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1.2,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: GridView.builder(
+            padding: const EdgeInsets.only(bottom: 20),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.9,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: CubeProvider.faces.length,
+            itemBuilder: (context, faceIndex) {
+              final face = CubeProvider.faces[faceIndex];
+              return _buildFaceCard(context, faceIndex, face, cubeProvider);
+            },
           ),
-          itemCount: CubeProvider.faces.length,
-          itemBuilder: (context, faceIndex) {
-            final face = CubeProvider.faces[faceIndex];
-            return _buildFaceGrid(context, faceIndex, face, cubeProvider);
-          },
         );
       },
     );
   }
   
-  Widget _buildFaceGrid(
+  Widget _buildFaceCard(
     BuildContext context,
     int faceIndex,
     Map<String, String> face,
@@ -36,26 +40,43 @@ class CubeGridWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        color: Colors.black.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         children: [
-          Text(
-            '${face['name']} (${face['color']})',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: _getColorValue(face['color']!.substring(0, 1)),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                face['name']!.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Expanded(
             child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                crossAxisSpacing: 2,
-                mainAxisSpacing: 2,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
               ),
               itemCount: 9,
               itemBuilder: (context, squareIndex) {
@@ -87,8 +108,9 @@ class CubeGridWidget extends StatelessWidget {
           ? () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Center squares are locked and cannot be changed'),
-                  duration: Duration(seconds: 2),
+                  content: Text('Center squares are fixed'),
+                  behavior: SnackBarBehavior.floating,
+                  duration: Duration(milliseconds: 500),
                 ),
               );
             }
@@ -98,29 +120,28 @@ class CubeGridWidget extends StatelessWidget {
               final nextColor = CubeProvider.colors[nextIndex];
               cubeProvider.changeColor(faceIndex, squareIndex, nextColor);
             },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: _getColorValue(currentColor),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: _getColorValue(currentColor).withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
           border: Border.all(
-            color: isCenter ? Colors.black : Colors.grey.shade400,
+            color: isCenter ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.1),
             width: isCenter ? 2 : 1,
           ),
-          boxShadow: isCenter
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-              : null,
         ),
         child: isCenter
             ? Icon(
-                Icons.lock,
-                size: 12,
-                color: Colors.grey.shade600,
+                Icons.lock_outline_rounded,
+                size: 14,
+                color: currentColor == 'W' || currentColor == 'Y' ? Colors.black54 : Colors.white70,
               )
             : null,
       ),
@@ -130,19 +151,25 @@ class CubeGridWidget extends StatelessWidget {
   Color _getColorValue(String color) {
     switch (color) {
       case 'W':
-        return Colors.white;
+      case 'White':
+        return AppColors.cubeWhite;
       case 'Y':
-        return Colors.yellow.shade400;
+      case 'Yellow':
+        return AppColors.cubeYellow;
       case 'R':
-        return Colors.red.shade500;
+      case 'Red':
+        return AppColors.cubeRed;
       case 'O':
-        return Colors.orange.shade500;
+      case 'Orange':
+        return AppColors.cubeOrange;
       case 'B':
-        return Colors.blue.shade500;
+      case 'Blue':
+        return AppColors.cubeBlue;
       case 'G':
-        return Colors.green.shade500;
+      case 'Green':
+        return AppColors.cubeGreen;
       default:
-        return Colors.grey.shade300;
+        return AppColors.textMuted;
     }
   }
 }

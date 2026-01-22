@@ -62,71 +62,101 @@ const Home = () => {
   const previewState = generateSolvedCube();
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-b from-slate-50 via-white to-slate-50">
-      {/* Decorative Background */}
+    <div className="min-h-screen relative bg-slate-950 text-slate-200 overflow-x-hidden">
+      {/* Premium Animated Mesh Background */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-gradient-to-tr from-blue-400/30 via-indigo-300/30 to-purple-300/30 blur-3xl" />
-        <div className="absolute top-1/3 -right-24 h-96 w-96 rounded-full bg-gradient-to-tr from-emerald-300/30 via-teal-300/30 to-cyan-300/30 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-gradient-to-tr from-amber-300/30 via-yellow-300/30 to-orange-300/30 blur-3xl" />
+        {/* Animated Orbs */}
+        <div className="absolute -top-[10%] -left-[10%] h-[60%] w-[60%] rounded-full bg-blue-600/20 blur-[120px] animate-float-slow" />
+        <div className="absolute top-[20%] -right-[10%] h-[50%] w-[50%] rounded-full bg-indigo-600/20 blur-[100px] animate-float-medium" />
+        <div className="absolute -bottom-[10%] left-[20%] h-[40%] w-[40%] rounded-full bg-purple-600/15 blur-[110px] animate-float-fast" />
+        <div className="absolute top-[50%] left-[10%] h-[30%] w-[30%] rounded-full bg-emerald-600/10 blur-[80px] animate-float-slow" />
+        
+        {/* Noise/Grain Texture Overlay */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] filter contrast-150 brightness-100" />
       </div>
+
       {/* Hero Section */}
-      <section className="py-12 md:py-20 px-4">
+      <section className="relative pt-20 pb-16 md:pt-32 md:pb-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-block rounded-2xl px-3 py-1.5 mb-5 bg-white/60 backdrop-blur-xl ring-1 ring-slate-200/60 shadow-sm">
-              <span className="text-xs font-semibold tracking-widest text-slate-600">SOLVE FASTER • LOOK COOLER</span>
+          <div className="text-center mb-16 relative z-10">
+            <div className="inline-flex items-center space-x-2 rounded-full px-4 py-1.5 mb-8 bg-blue-500/10 border border-blue-500/20 backdrop-blur-md">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              <span className="text-xs font-bold tracking-[0.2em] text-blue-400 uppercase">AI Powered Solver</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-4 md:mb-6 leading-tight">
-              Solve Your
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"> Rubik's Cube</span>
+            
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tight">
+              MASTER THE <br />
+              <span className="bg-gradient-to-b from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent">CUBE</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto px-1">
-              Can't solve your Rubik's cube? Manually input your colors and get a stylish, step‑by‑step solution.
+            
+            <p className="text-lg md:text-2xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+              Experience the future of Rubik's solving. Styled, step-by-step algorithms delivered with precision.
             </p>
-            <div className="flex justify-center">
+            
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Link
                 to="/manual"
-                className="tap-target inline-flex items-center justify-center px-8 py-4 rounded-full text-white bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 shadow-[0_10px_28px_rgba(16,185,129,0.35)] hover:shadow-[0_14px_32px_rgba(13,148,136,0.45)] hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-600 active:scale-[0.98] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-400 font-semibold tracking-wide"
+                className="group relative inline-flex items-center justify-center px-10 py-5 rounded-2xl text-white font-bold text-lg transition-all active:scale-95 bg-blue-600 shadow-[0_0_40px_rgba(37,99,235,0.3)] hover:shadow-[0_0_60px_rgba(37,99,235,0.5)] overflow-hidden"
               >
-                <Palette className="mr-2 h-5 w-5" />
-                Open Manual Input
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <Palette className="mr-3 h-6 w-6 group-hover:rotate-12 transition-transform" />
+                GET STARTED
               </Link>
+              
+              <button className="px-8 py-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-bold hover:bg-slate-800 transition-colors">
+                LEARN MORE
+              </button>
             </div>
           </div>
 
-          {/* 3D Cube Preview */}
-          <div className="flex justify-center mb-12 md:mb-16">
-            <div className="relative w-full max-w-xl sm:max-w-2xl h-[320px] sm:h-96 rounded-3xl shadow-2xl overflow-hidden bg-white/60 backdrop-blur-xl ring-1 ring-white/60">
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-white/20" />
-              <Cube3D cubeState={previewState} autoRotate={true} />
+          {/* 3D Cube Preview with Glassmorphic Container */}
+          <div className="mt-20 flex justify-center perspective-[2000px]">
+            <div className="relative w-full max-w-3xl aspect-video rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden bg-slate-900/40 backdrop-blur-2xl ring-1 ring-white/10 group">
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-transparent to-purple-500/5 opacity-50" />
+              <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-30">
+                {[...Array(3)].map((_, i) => <div key={i} className="w-1.5 h-1.5 rounded-full bg-white" />)}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Cube3D cubeState={previewState} autoRotate={true} />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Action Cards */}
-      <section className="py-12 md:py-16 px-4">
+      {/* Action Cards Section */}
+      <section className="py-24 px-4 bg-slate-950/50">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Get Started</span>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+          <div className="flex items-center justify-between mb-16">
+            <h2 className="text-3xl font-bold text-white tracking-tight">SOLVER MODES</h2>
+            <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {actions.map((action, index) => {
               const Icon = action.icon;
               return (
                 <Link
                   key={index}
                   to={action.path}
-                  className="group block rounded-2xl bg-gradient-to-tr from-slate-200 to-slate-100 p-[1px] shadow-lg hover:shadow-xl active:shadow-md transition-all duration-200 active:scale-[0.995]"
+                  className="group relative flex items-center p-8 rounded-3xl bg-slate-900/50 border border-slate-800/50 hover:bg-slate-900 hover:border-blue-500/50 transition-all duration-300 overflow-hidden"
                 >
-                  <div className="h-full w-full rounded-2xl bg-white/70 backdrop-blur-xl p-6 sm:p-7 md:p-8 ring-1 ring-white/60">
-                    <div className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full ${getColorClasses(action.color)} mb-5 sm:mb-6 group-hover:scale-105 transition-transform`}>
-                      <Icon className="h-7 w-7 sm:h-8 sm:w-8" />
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                    <Icon size={120} />
+                  </div>
+                  
+                  <div className={`flex-shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center mr-8 ${getColorClasses(action.color)} shadow-2xl group-hover:scale-110 transition-transform`}>
+                    <Icon size={32} />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
                       {action.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                    <p className="text-slate-400 leading-relaxed max-w-xs">
                       {action.description}
                     </p>
                   </div>
@@ -137,29 +167,27 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-12 md:py-16 px-4">
+      {/* Features Grid */}
+      <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">Features</span>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+          <div className="text-center mb-20">
+            <h2 className="text-sm font-bold tracking-[0.3em] text-indigo-400 uppercase mb-4">Core Capabilities</h2>
+            <h3 className="text-4xl md:text-5xl font-extrabold text-white">ENGINEERED FOR SPEED</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <div
                   key={index}
-                  className="text-center p-5 sm:p-6 bg-white/70 backdrop-blur-xl rounded-xl shadow-md hover:shadow-lg transition-all ring-1 ring-white/60 hover:-translate-y-0.5"
+                  className="p-8 rounded-3xl bg-slate-900/30 border border-slate-800/50 backdrop-blur-sm hover:translate-y-[-8px] transition-all duration-300"
                 >
-                  <div className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full ${getColorClasses(feature.color)} mb-3 sm:mb-4`}>
-                    <Icon className="h-7 w-7 sm:h-8 sm:w-8" />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 ${getColorClasses(feature.color)}`}>
+                    <Icon size={24} />
                   </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {feature.description}
-                  </p>
+                  <h4 className="text-xl font-bold text-white mb-3">{feature.title}</h4>
+                  <p className="text-slate-400 text-sm leading-relaxed">{feature.description}</p>
                 </div>
               );
             })}
@@ -167,29 +195,17 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-12 md:py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Ready to Solve Your Cube?</span>
-          </h2>
-          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
-            Thousands of people have already learned to solve their cubes with our help. You can too!
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link
-              to="/history"
-              className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-gray-600 text-white font-semibold rounded-xl hover:bg-gray-700 active:bg-gray-800 transition-colors shadow-md active:scale-[0.99]"
-            >
-              <History className="mr-2 h-5 w-5" />
-              View Examples
-            </Link>
+      {/* Footer CTA */}
+      <section className="py-32 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-blue-600/5 blur-[150px] mix-blend-screen" />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-10 tracking-tight">READY TO <br /><span className="text-blue-500">SOLVE?</span></h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/manual"
-              className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 active:bg-emerald-800 transition-colors shadow-md active:scale-[0.99]"
+              className="px-12 py-5 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-500 transition-all active:scale-95 shadow-2xl shadow-blue-500/20"
             >
-              <Zap className="mr-2 h-5 w-5" />
-              Go to Manual Input
+              LAUNCH SOLVER
             </Link>
           </div>
         </div>

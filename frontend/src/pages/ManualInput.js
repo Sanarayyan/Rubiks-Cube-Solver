@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, RotateCcw, Play, ArrowLeft, AlertTriangle, CheckCircle, Info, X, Eye, EyeOff } from 'lucide-react';
+import { Box, Smartphone, RotateCcw, Play, ArrowLeft, AlertTriangle, CheckCircle, Info, X, Palette, LayoutGrid } from 'lucide-react';
 import { cubeAPI, generateSolvedCube, validateCentersAndCounts, validateCubeStateDetailed } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import CubeNet2D from '../components/CubeNet2D';
@@ -81,11 +81,11 @@ const ManualInput = () => {
 
   const solveCube = async () => {
     setIsLoading(true);
-    
+
     // Only validate when solve button is clicked
     const validationResult = validateCubeStateDetailed(cubeState);
     setValidation(validationResult);
-    
+
     if (!validationResult.isValid) {
       showError('Oops! Something needs fixing. Check the color counter below!');
       setHighlightErrors(true);
@@ -93,7 +93,7 @@ const ManualInput = () => {
       setTimeout(() => { summaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
       return;
     }
-    
+
     try {
       const result = await cubeAPI.solveCube(cubeState, mode);
       if (result.success) {
@@ -129,12 +129,12 @@ const ManualInput = () => {
     };
 
     let baseClass = baseColors[color] || 'bg-gray-300 border-gray-400';
-    
+
     // Add error highlighting if enabled and this sticker has an error
     if (highlightErrors && validation && !validation.isValid) {
       const globalIndex = faceIndex * 9 + squareIndex;
       const isCenter = [4, 13, 22, 31, 40, 49].includes(globalIndex);
-      
+
       // Check if this is a center piece with wrong color
       if (isCenter) {
         const expectedCenter = faces[faceIndex].color.charAt(0);
@@ -142,14 +142,14 @@ const ManualInput = () => {
           baseClass += ' animate-pulse ring-4 ring-red-500 ring-opacity-75 shadow-lg';
         }
       }
-      
+
       // Check if this color has wrong count
       const colorCount = validation.colorCounts[color] || 0;
       if (colorCount !== 9) {
         baseClass += ' ring-2 ring-orange-400 ring-opacity-75';
       }
     }
-    
+
     return baseClass;
   };
 
@@ -177,253 +177,81 @@ const ManualInput = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-6 md:py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Back Arrow Button - Mobile Style */}
-        <div className="mb-6">
-          <button
-            onClick={() => navigate('/')}
-            className="w-10 h-10 bg-white/90 backdrop-blur-sm text-gray-700 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 border border-gray-200 flex items-center justify-center"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        </div>
-        
-        <div className="text-center mb-6 md:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 md:mb-4">Manual Cube Input</h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600">Set the colors for each face of your cube</p>
-        </div>
+    <div className="min-h-screen relative bg-[#0D061A] text-slate-200 overflow-hidden font-sans">
+      {/* Background Glows */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/20 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] bg-blue-900/10 blur-[100px] rounded-full" />
+      </div>
 
-        {/* Validation Status Bar - Only show when validation exists */}
-        {validation && (
-          <div className="mb-6" ref={summaryRef}>
-            <div className={`p-6 rounded-xl border-2 shadow-lg ${
-              validation.isValid 
-                ? 'bg-green-50 border-green-200 text-green-800' 
-                : 'bg-red-50 border-red-200 text-red-800'
-            }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                <div className="flex items-center gap-3">
-                  {validation.isValid ? (
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  ) : (
-                    <AlertTriangle className="w-8 h-8 text-red-600" />
-                  )}
-                  <div>
-                    <h3 className="text-xl font-bold">
-                      {validation.isValid ? '🎉 Great Job! Your Cube is Ready!' : '🔍 Let\'s Fix Your Cube!'}
-                    </h3>
-                    {!validation.isValid && (
-                      <p className="text-sm opacity-90">Tap buttons to see details. Color counter below.</p>
-                    )}
-                  </div>
-                </div>
-                {!validation.isValid && (
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={() => setShowErrors(!showErrors)} className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">{showErrors ? 'Hide Problems' : 'Show Problems'}</button>
-                    <button onClick={() => setShowWarnings(!showWarnings)} className="px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600">{showWarnings ? 'Hide Checks' : 'Things to Check'}</button>
-                    <button onClick={() => setShowSuggestions(!showSuggestions)} className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">{showSuggestions ? 'Hide Tips' : 'How to Fix'}</button>
-                    <button onClick={() => setHighlightErrors(!highlightErrors)} className={`px-3 py-1.5 text-sm rounded-md ${highlightErrors ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>{highlightErrors ? 'Hide Highlights' : 'Show Highlights'}</button>
-                  </div>
-                )}
-              </div>
+      <div className="relative z-10 flex flex-col items-center min-h-screen px-6 pt-12 pb-24">
+        {/* Top Header Section */}
+        <div className="w-full max-w-lg flex items-center justify-between mb-12">
+          {/* Mode Pill Toggle */}
+          <div className="bg-[#2D1B4D] p-1 rounded-2xl flex items-center shadow-inner">
+            <button
+              onClick={() => setMode('beginner')}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === 'beginner'
+                ? 'bg-[#E0E7FF] text-[#1E1B4B] shadow-lg'
+                : 'text-slate-400 bg-transparent'
+                }`}
+            >
+              BEGINNER
+            </button>
+            <button
+              onClick={() => setMode('fast')}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === 'fast'
+                ? 'bg-[#E0E7FF] text-[#1E1B4B] shadow-lg'
+                : 'text-slate-400 bg-transparent'
+                }`}
+            >
+              PRO
+            </button>
+          </div>
 
-              {/* Always show Color Count Summary */}
-              <div className="mt-2 p-5 sm:p-6 bg-gray-100 rounded-xl">
-                <h4 className="text-lg font-bold mb-4 text-gray-800">🎨 Color Count Summary</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                  {Object.entries(validation.colorCounts).map(([color, count]) => (
-                    <div key={color} className={`p-3 rounded-lg border-2 transition-all ${
-                      count === 9 
-                        ? 'bg-green-100 border-green-300 text-green-800' 
-                        : 'bg-red-100 border-red-300 text-red-800'
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-6 h-6 rounded border-2 ${getColorClasses(color, 0, 0)}`}></div>
-                        <div>
-                          <div className="font-bold">{colorNames[color]}</div>
-                          <div className="text-sm">
-                            {count === 9 ? (
-                              <span className="text-green-700">✅ Perfect! (9/9)</span>
-                            ) : (
-                              <span className="text-red-700">
-                                {count > 9 ? '❌ Too many!' : '❌ Not enough!'} ({count}/9)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Collapsible Details */}
-              {showErrors && validation.errors.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-lg font-bold mb-3 flex items-center gap-2 text-red-700"><AlertTriangle className="w-5 h-5" /> Problems to Fix</h4>
-                  <div className="grid gap-3">
-                    {validation.errors.map((error, index) => (
-                      <div key={index} className="p-4 bg-red-100 rounded-lg border-l-4 border-red-500">
-                        <div className="flex items-start gap-3">
-                          <span className="text-red-600 font-bold">{index + 1}.</span>
-                          <p className="text-red-800">{makeKidFriendly(error)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {showWarnings && validation.warnings.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-lg font-bold mb-3 flex items-center gap-2 text-orange-700"><Info className="w-5 h-5" /> Things to Check</h4>
-                  <div className="grid gap-3">
-                    {validation.warnings.map((warning, index) => (
-                      <div key={index} className="p-4 bg-orange-100 rounded-lg border-l-4 border-orange-500">
-                        <div className="flex items-start gap-3">
-                          <span className="text-orange-600 font-bold">{index + 1}.</span>
-                          <p className="text-orange-800">{warning}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {showSuggestions && validation.suggestions.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-lg font-bold mb-3 flex items-center gap-2 text-blue-700"><Info className="w-5 h-5" /> How to Fix</h4>
-                  <div className="grid gap-3">
-                    {validation.suggestions.map((suggestion, index) => (
-                      <div key={index} className="p-4 bg-blue-100 rounded-lg border-l-4 border-blue-500">
-                        <div className="flex items-start gap-3">
-                          <span className="text-blue-600 font-bold">{index + 1}.</span>
-                          <p className="text-blue-800">{suggestion}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* Theme Switcher Mock */}
+          <div className="w-16 h-8 bg-[#E0E7FF] rounded-full p-1 flex items-center justify-end shadow-lg cursor-pointer">
+            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
+              <span role="img" aria-label="dark-mode" className="text-xs">🌙</span>
             </div>
           </div>
-        )}
+        </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
-          {/* Cube Configuration */}
-          <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Cube Configuration</h2>
+        {/* Main Content Area (Cube / Setup) */}
+        <div className="flex-1 w-full flex flex-col items-center justify-center relative">
+          {inputMode === '3d' && (
+            <div className="relative w-full aspect-square max-w-[400px] flex items-center justify-center">
+              {/* Rotation Ring Overlay */}
+              <div className="absolute bottom-[10%] w-[85%] aspect-[2/1] border-[1px] border-slate-500/30 rounded-[100%] pointer-events-none flex items-center justify-center">
+                <div className="absolute bottom-[-6px] w-4 h-4 bg-[#E0E7FF] rounded-full border-[3px] border-[#0D061A] shadow-lg shadow-white/20" />
+              </div>
 
-            {/* Mode toggle */}
-            <div className="mb-4 flex flex-wrap items-center gap-3 sm:gap-4">
-              <span className="text-sm font-medium text-gray-700">Mode:</span>
-              <div className="flex items-center gap-2 bg-white p-1 rounded-full border border-gray-200 shadow-sm">
-                <label className="sr-only" htmlFor="mode-fast">Pro</label>
-                <input id="mode-fast" type="radio" name="mode" value="fast" checked={mode === 'fast'} onChange={() => setMode('fast')} className="sr-only" />
-                <button
-                  type="button"
-                  onClick={() => setMode('fast')}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    mode === 'fast'
-                      ? 'text-white bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 shadow-[0_4px_14px_rgba(99,102,241,0.35)]'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                  aria-pressed={mode === 'fast'}
-                >
-                  Pro
-                </button>
-                <label className="sr-only" htmlFor="mode-beginner">Beginner</label>
-                <input id="mode-beginner" type="radio" name="mode" value="beginner" checked={mode === 'beginner'} onChange={() => setMode('beginner')} className="sr-only" />
-                <button
-                  type="button"
-                  onClick={() => setMode('beginner')}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    mode === 'beginner'
-                      ? 'text-white bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 shadow-[0_4px_14px_rgba(13,148,136,0.35)]'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                  aria-pressed={mode === 'beginner'}
-                >
-                  Beginner
-                </button>
+              <div className="w-full h-full opacity-100 scale-110">
+                <Cube3D cubeState={cubeState} onStickerClick={handleStickerClick} lockCenters={true} onCenterBlocked={notifyCenterBlocked} />
               </div>
             </div>
+          )}
 
-            {/* 2D input mode toggle */}
-            <div className="mb-6 flex flex-wrap items-center gap-3 sm:gap-4">
-              <span className="text-sm font-medium text-gray-700">Input Mode:</span>
-              <div className="flex items-center gap-2 bg-white p-1 rounded-full border border-gray-200 shadow-sm">
-                <label className="sr-only" htmlFor="input-grid">Face Grid</label>
-                <input id="input-grid" type="radio" name="inputMode" value="grid" checked={inputMode === 'grid'} onChange={() => setInputMode('grid')} className="sr-only" />
-                <button
-                  type="button"
-                  onClick={() => setInputMode('grid')}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    inputMode === 'grid'
-                      ? 'text-white bg-gradient-to-r from-fuchsia-500 via-pink-600 to-rose-600 shadow-[0_4px_14px_rgba(236,72,153,0.35)]'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                  aria-pressed={inputMode === 'grid'}
-                >
-                  Face Grid
-                </button>
-                <label className="sr-only" htmlFor="input-net">Cross Net (image)</label>
-                <input id="input-net" type="radio" name="inputMode" value="net" checked={inputMode === 'net'} onChange={() => setInputMode('net')} className="sr-only" />
-                <button
-                  type="button"
-                  onClick={() => setInputMode('net')}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    inputMode === 'net'
-                      ? 'text-white bg-gradient-to-r from-amber-500 via-orange-600 to-red-600 shadow-[0_4px_14px_rgba(234,179,8,0.35)]'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                  aria-pressed={inputMode === 'net'}
-                >
-                  Cross Net (image)
-                </button>
-                <label className="sr-only" htmlFor="input-3d">3D Clickable</label>
-                <input id="input-3d" type="radio" name="inputMode" value="3d" checked={inputMode === '3d'} onChange={() => setInputMode('3d')} className="sr-only" />
-                <button
-                  type="button"
-                  onClick={() => setInputMode('3d')}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    inputMode === '3d'
-                      ? 'text-white bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 shadow-[0_4px_14px_rgba(59,130,246,0.35)]'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                  aria-pressed={inputMode === '3d'}
-                >
-                  3D Clickable
-                </button>
-              </div>
-            </div>
-
-            {inputMode === 'grid' ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+          {inputMode === 'grid' && (
+            <div className="w-full max-w-md bg-[#1F1235]/40 backdrop-blur-xl rounded-[2.5rem] p-6 border border-white/5 shadow-2xl overflow-y-auto max-h-[60vh]">
+              <div className="grid grid-cols-2 gap-4">
                 {faces.map((face, faceIndex) => (
-                  <div key={face.key} className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-900 mb-3">
-                      {face.name} ({face.color})
-                    </h3>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {Array.from({ length: 9 }, (_, squareIndex) => {
-                        const globalIndex = faceIndex * 9 + squareIndex;
-                        const currentColor = cubeState[globalIndex];
+                  <div key={face.key} className="bg-white/5 rounded-2xl p-3 border border-white/5">
+                    <p className="text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest">{face.name}</p>
+                    <div className="grid grid-cols-3 gap-1">
+                      {Array.from({ length: 9 }, (_, sqIdx) => {
+                        const globalIdx = faceIndex * 9 + sqIdx;
+                        const color = cubeState[globalIdx];
                         return (
                           <button
-                            key={squareIndex}
+                            key={sqIdx}
                             onClick={() => {
-                              if (squareIndex === 4) { notifyCenterBlocked(); return; }
-                              const currentIndex = colors.indexOf(currentColor);
-                              const nextIndex = (currentIndex + 1) % colors.length;
-                              handleColorChange(faceIndex, squareIndex, colors[nextIndex]);
+                              if (sqIdx === 4) { notifyCenterBlocked(); return; }
+                              const curIdx = colors.indexOf(color);
+                              const nxtIdx = (curIdx + 1) % colors.length;
+                              handleColorChange(faceIndex, sqIdx, colors[nxtIdx]);
                             }}
-                            className={`
-                              w-9 h-9 sm:w-8 sm:h-8 rounded border-2 transition-all duration-200 active:scale-95 sm:hover:scale-110
-                              ${getColorClasses(currentColor, faceIndex, squareIndex)}
-                            `}
-                            title={`${colorNames[currentColor]} - Click to change`}
+                            className={`w-full aspect-square rounded-md border-[1.5px] border-black/20 ${getColorClasses(color, faceIndex, sqIdx)}`}
                           />
                         );
                       })}
@@ -431,90 +259,94 @@ const ManualInput = () => {
                   </div>
                 ))}
               </div>
-            ) : inputMode === 'net' ? (
-              <div className="w-full aspect-[12/9] rounded-lg overflow-hidden bg-gray-200">
+            </div>
+          )}
+
+          {inputMode === 'net' && (
+            <div className="w-full flex-1 flex flex-col items-center justify-center">
+              {/* Status Badge */}
+              <div className="mb-8 px-8 py-3 bg-[#2D1B4D] backdrop-blur-xl border border-white/5 rounded-2xl shadow-lg flex items-center gap-3">
+                <span className="text-xl">🎉</span>
+                <span className="text-sm font-bold text-white tracking-wide uppercase">Solved</span>
+              </div>
+
+              <div className="scale-90 sm:scale-100">
                 <CubeNet2D cubeState={cubeState} onCellClick={handleStickerClick} lockCenters={true} onCenterBlocked={notifyCenterBlocked} />
               </div>
-            ) : (
-              <div className="h-[320px] sm:h-96 rounded-lg overflow-hidden bg-white">
-                <Cube3D cubeState={cubeState} onStickerClick={handleStickerClick} lockCenters={true} onCenterBlocked={notifyCenterBlocked} />
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
-              <button onClick={resetCube} className="tap-target flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 shadow-lg shadow-gray-800/30 hover:from-gray-600 hover:via-gray-700 hover:to-gray-800 active:scale-[0.98] transition-all ring-1 ring-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400">
-                <RotateCcw className="w-4 h-4" />
-                <span className="font-semibold tracking-wide">Reset to Solved</span>
-              </button>
-              <button 
-                onClick={solveCube} 
-                disabled={isLoading} 
-                className="tap-target flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-white bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 shadow-[0_8px_24px_rgba(59,130,246,0.35)] hover:shadow-[0_10px_28px_rgba(99,102,241,0.45)] hover:from-blue-500 hover:via-indigo-500 hover:to-purple-600 active:scale-[0.98] disabled:opacity-50 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
-              >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                <span className="font-semibold tracking-wide">{isLoading ? 'Solving...' : 'Solve Cube'}</span>
-              </button>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Solution Display */}
-          <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Solution</h2>
-            {solution ? (
-              <div>
-                {solution.orientationBaseline && (
-                  <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200 text-yellow-900">
-                    <strong>Hold:</strong> {solution.orientationBaseline}
-                  </div>
-                )}
-                <div className="mb-4 p-4 bg-green-50 rounded-lg">
-                  <h3 className="font-semibold text-green-800 mb-2">Solution Found!</h3>
-                  <p className="text-green-700">{solution.moves.length} moves • Estimated time: {solution.estimatedTime}s</p>
-                </div>
-                <div className="mb-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Moves:</h4>
-                  <div className="flex flex-col gap-2">
-                    {solution.moves.map((move, index) => (
-                      <div key={index} className="p-3 rounded border border-gray-200 bg-gray-50">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-blue-700">{index + 1}. {move.notation}</span>
-                          <span className="text-sm text-gray-600">{move.description}</span>
-                        </div>
-                        {mode === 'beginner' && (
-                          <div className="mt-2 text-sm text-gray-700">
-                            <div><strong>Hand:</strong> {move.hand || '—'}</div>
-                            <div><strong>Grip:</strong> {move.grip || '—'}</div>
-                            {move.tip && <div><strong>Tip:</strong> {move.tip}</div>}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <button onClick={viewSolution} className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors">
-                  <Play className="w-4 h-4" />
-                  View 3D Solution
-                </button>
-              </div>
+        {/* Solve Button Section */}
+        <div className="mt-8 mb-4 w-full max-w-xs flex flex-col items-center gap-4">
+          {validation && !validation.isValid && (
+            <div className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-center">
+              <p className="text-[10px] text-red-400 font-bold uppercase tracking-tight">Cube needs more work • Check counts</p>
+            </div>
+          )}
+
+          <button
+            onClick={() => {
+              const validationResult = validateCubeStateDetailed(cubeState);
+              navigate('/notfound', { state: { cubeState, validation: validationResult } });
+            }}
+            disabled={isLoading}
+            className={`flex-1 max-w-sm h-16 rounded-3xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-[0_15px_30px_rgba(139,92,246,0.3)] hover:shadow-[0_20px_40px_rgba(139,92,246,0.4)] ${isLoading ? 'bg-slate-800 pointer-events-none' : 'bg-gradient-to-r from-[#F43F5E] via-[#8B5CF6] to-[#3B82F6] text-white'
+              }`}
+          >
+            {isLoading ? (
+              <RotateCcw className="w-5 h-5 animate-spin" />
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                  <Save className="w-8 h-8 text-gray-400" />
-                </div>
-                <p>Choose a mode, configure your cube in Grid or Net view, then click "Solve Cube".</p>
-                {validation && !validation.isValid && (
-                  <p className="text-sm text-red-500 mt-2">
-                    Fix the errors above before you can solve the cube.
-                  </p>
-                )}
+              <div className="flex items-center gap-3">
+                <Box className="w-6 h-6" />
+                <span className="text-sm font-black uppercase tracking-wider">Solve</span>
               </div>
             )}
-          </div>
+          </button>
         </div>
+
+        {/* Floating Dock Navigation */}
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#1F1235]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-2 flex items-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          <button
+            onClick={() => setInputMode('3d')}
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${inputMode === '3d' ? 'bg-white text-[#1F1235]' : 'text-slate-400 hover:text-white'}`}
+          >
+            <Box size={22} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => setInputMode('grid')}
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${inputMode === 'grid' ? 'bg-white text-[#1F1235]' : 'text-slate-400 hover:text-white'}`}
+          >
+            <LayoutGrid size={22} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => setInputMode('net')}
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${inputMode === 'net' ? 'bg-white text-[#1F1235]' : 'text-slate-400 hover:text-white'}`}
+          >
+            <div className="flex flex-col items-center gap-[1px]">
+              <div className="w-1.5 h-1.5 rounded-[1px] bg-current" />
+              <div className="flex gap-[1px]">
+                {[...Array(3)].map((_, i) => <div key={i} className="w-1.5 h-1.5 rounded-[1px] bg-current" />)}
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => navigate('/history')}
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 text-slate-400 hover:text-white`}
+          >
+            <Smartphone size={22} strokeWidth={2.5} />
+          </button>
+        </div>
+
+        {/* Floating Result Nav */}
+        {solution && (
+          <button
+            onClick={viewSolution}
+            className="fixed top-32 right-6 p-4 bg-green-500 text-white rounded-full shadow-2xl animate-bounce"
+          >
+            <Play size={20} />
+          </button>
+        )}
       </div>
     </div>
   );

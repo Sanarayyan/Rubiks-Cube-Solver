@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import '../providers/cube_provider.dart';
 import '../widgets/cube_grid_widget.dart';
 import '../widgets/solution_display_widget.dart';
+import '../utils/app_colors.dart';
 
 class ManualInputScreen extends StatefulWidget {
   const ManualInputScreen({super.key});
@@ -15,300 +17,254 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Manual Cube Input'),
-        backgroundColor: Colors.blue.shade600,
-        foregroundColor: Colors.white,
+        title: const Text('CONFIGURE CUBE'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade50,
-              Colors.indigo.shade100,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // Mode selection
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Solving Mode',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Consumer<CubeProvider>(
+      body: Stack(
+        children: [
+          const BoxDecoration(gradient: AppColors.backgroundGradient).build(context),
+          
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  
+                  // Selection Section
+                  _buildSelectionPanel(context),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Main Cube Area
+                  Expanded(
+                    child: _buildGlassPanel(
+                      child: Consumer<CubeProvider>(
                         builder: (context, cubeProvider, child) {
-                          return Row(
+                          return Column(
                             children: [
-                              Expanded(
-                                child: _buildModeButton(
-                                  context,
-                                  'Pro',
-                                  'fast',
-                                  cubeProvider.mode == 'fast',
-                                  Colors.purple,
-                                  () => cubeProvider.setMode('fast'),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  'TAP SQUARES TO CHANGE COLORS',
+                                  style: TextStyle(
+                                    color: AppColors.primary.withOpacity(0.8),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
                               Expanded(
-                                child: _buildModeButton(
-                                  context,
-                                  'Beginner',
-                                  'beginner',
-                                  cubeProvider.mode == 'beginner',
-                                  Colors.green,
-                                  () => cubeProvider.setMode('beginner'),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Input mode selection
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Input Mode',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Consumer<CubeProvider>(
-                        builder: (context, cubeProvider, child) {
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: _buildModeButton(
-                                  context,
-                                  'Grid',
-                                  'grid',
-                                  cubeProvider.inputMode == 'grid',
-                                  Colors.pink,
-                                  () => cubeProvider.setInputMode('grid'),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildModeButton(
-                                  context,
-                                  'Net',
-                                  'net',
-                                  cubeProvider.inputMode == 'net',
-                                  Colors.orange,
-                                  () => cubeProvider.setInputMode('net'),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildModeButton(
-                                  context,
-                                  '3D',
-                                  '3d',
-                                  cubeProvider.inputMode == '3d',
-                                  Colors.blue,
-                                  () => cubeProvider.setInputMode('3d'),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Cube input area
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Consumer<CubeProvider>(
-                      builder: (context, cubeProvider, child) {
-                        return Column(
-                          children: [
-                            Text(
-                              'Cube Configuration',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: cubeProvider.inputMode == 'grid'
-                                  ? const CubeGridWidget()
-                                  : cubeProvider.inputMode == 'net'
-                                      ? const Center(
-                                          child: Text('Net view coming soon!'),
-                                        )
-                                      : const Center(
-                                          child: Text('3D view coming soon!'),
+                                child: cubeProvider.inputMode == 'grid'
+                                    ? const CubeGridWidget()
+                                    : Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.construction_rounded, color: AppColors.textMuted, size: 48),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              '${cubeProvider.inputMode.toUpperCase()} VIEW COMING SOON',
+                                              style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
                                         ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: () => cubeProvider.resetCube(),
-                                    icon: const Icon(Icons.refresh),
-                                    label: const Text('Reset'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey.shade600,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                              ),
+                              
+                              // Bottom Action Row
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                  children: [
+                                    IconButton.filledTonal(
+                                      onPressed: () => cubeProvider.resetCube(),
+                                      icon: const Icon(Icons.refresh_rounded),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: AppColors.surfaceLight,
+                                        foregroundColor: AppColors.textPrimary,
+                                        padding: const EdgeInsets.all(16),
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildSolveButton(cubeProvider),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Consumer<CubeProvider>(
-                                    builder: (context, cubeProvider, child) {
-                                      return ElevatedButton.icon(
-                                        onPressed: cubeProvider.isLoading
-                                            ? null
-                                            : () => cubeProvider.solveCube(),
-                                        icon: cubeProvider.isLoading
-                                            ? const SizedBox(
-                                                width: 16,
-                                                height: 16,
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                                ),
-                                              )
-                                            : const Icon(Icons.play_arrow),
-                                        label: Text(
-                                          cubeProvider.isLoading ? 'Solving...' : 'Solve Cube',
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.blue.shade600,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        );
-                      },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Solution display
-                Consumer<CubeProvider>(
-                  builder: (context, cubeProvider, child) {
-                    if (cubeProvider.solution != null) {
-                      return SolutionDisplayWidget(solution: cubeProvider.solution!);
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ],
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Solution display (Collapsible or Scrollable)
+                  Consumer<CubeProvider>(
+                    builder: (context, cubeProvider, child) {
+                      if (cubeProvider.solution != null) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: SolutionDisplayWidget(solution: cubeProvider.solution!),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectionPanel(BuildContext context) {
+    return _buildGlassPanel(
+      padding: const EdgeInsets.all(16),
+      child: Consumer<CubeProvider>(
+        builder: (context, cubeProvider, child) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildMiniToggle(
+                    'MODE',
+                    ['FAST', 'BEGINNER'],
+                    cubeProvider.mode == 'fast' ? 0 : 1,
+                    (idx) => cubeProvider.setMode(idx == 0 ? 'fast' : 'beginner'),
+                  ),
+                  _buildMiniToggle(
+                    'VIEW',
+                    ['GRID', 'NET', '3D'],
+                    cubeProvider.inputMode == 'grid' ? 0 : (cubeProvider.inputMode == 'net' ? 1 : 2),
+                    (idx) => cubeProvider.setInputMode(idx == 0 ? 'grid' : (idx == 1 ? 'net' : '3d')),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMiniToggle(String label, List<String> options, int currentIdx, Function(int) onToggle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(options.length, (i) {
+              bool isSelected = i == currentIdx;
+              return GestureDetector(
+                onTap: () => onToggle(i),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: isSelected ? [
+                      BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 8)
+                    ] : null,
+                  ),
+                  child: Text(
+                    options[i],
+                    style: TextStyle(
+                      color: isSelected ? AppColors.background : AppColors.textSecondary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGlassPanel({required Widget child, EdgeInsets? padding}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
+          ),
+          child: child,
         ),
       ),
     );
   }
-  
-  Widget _buildModeButton(
-    BuildContext context,
-    String title,
-    String value,
-    bool isSelected,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? color : Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey.shade300,
-            width: 2,
+
+  Widget _buildSolveButton(CubeProvider cubeProvider) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: cubeProvider.isLoading ? null : () => cubeProvider.solveCube(),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        child: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey.shade700,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        child: cubeProvider.isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.background),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.auto_fix_high_rounded, size: 20),
+                  SizedBox(width: 8),
+                  Text('SOLVE NOW'),
+                ],
+              ),
       ),
     );
   }
+}
+
+extension ContainerExt on BoxDecoration {
+  Widget build(BuildContext context) => Container(decoration: this);
 }

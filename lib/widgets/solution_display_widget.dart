@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../models/solution.dart';
+import '../utils/app_colors.dart';
 
 class SolutionDisplayWidget extends StatelessWidget {
   final Solution solution;
@@ -11,187 +13,191 @@ class SolutionDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.check_circle,
-                color: Colors.green.shade600,
-                size: 24,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Solution Found!',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.shade700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${solution.moves.length} moves • Estimated time: ${solution.estimatedTime}s',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey.shade600,
-            ),
-          ),
-          if (solution.orientationBaseline != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.yellow.shade200),
-              ),
-              child: Row(
+              Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.yellow.shade700,
-                    size: 20,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.auto_awesome_rounded,
+                      color: AppColors.accent,
+                      size: 20,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Hold: ${solution.orientationBaseline}',
-                      style: TextStyle(
-                        color: Colors.yellow.shade800,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'OPTIMAL SOLUTION',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                      fontSize: 14,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-          const SizedBox(height: 16),
-          Text(
-            'Moves:',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              itemCount: solution.moves.length,
-              itemBuilder: (context, index) {
-                final move = solution.moves[index];
-                return _buildMoveCard(context, move, index + 1);
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Navigate to 3D solution view
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('3D solution view coming soon!'),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('View 3D Solution'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade600,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildMoveCard(BuildContext context, Move move, int moveNumber) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$moveNumber. ${move.notation}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              const SizedBox(height: 16),
+              _buildInfoRow(),
+              const SizedBox(height: 20),
+              _buildOrientationCard(),
+              const SizedBox(height: 24),
+              const Text(
+                'SEQUENCE',
+                style: TextStyle(
+                  color: AppColors.textMuted,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade700,
+                  fontSize: 10,
+                  letterSpacing: 2,
                 ),
               ),
-              Text(
-                move.description,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 140,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: solution.moves.length,
+                  itemBuilder: (context, index) {
+                    final move = solution.moves[index];
+                    return _buildMoveCard(context, move, index + 1);
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('3D Engine initializing...'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.play_circle_filled_rounded),
+                  label: const Text('START 3D GUIDE'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.background,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
                 ),
               ),
             ],
           ),
-          if (move.hand != null || move.grip != null || move.tip != null) ...[
-            const SizedBox(height: 8),
-            if (move.hand != null)
-              _buildMoveDetail('Hand', move.hand!),
-            if (move.grip != null)
-              _buildMoveDetail('Grip', move.grip!),
-            if (move.tip != null)
-              _buildMoveDetail('Tip', move.tip!),
-          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow() {
+    return Row(
+      children: [
+        _buildInfoChip(Icons.timer_outlined, '${solution.estimatedTime}s'),
+        const SizedBox(width: 12),
+        _buildInfoChip(Icons.multiple_stop_rounded, '${solution.moves.length} Moves'),
+        const SizedBox(width: 12),
+        _buildInfoChip(Icons.psychology_outlined, solution.algorithm ?? 'AI'),
+      ],
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.textSecondary, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
   }
-  
-  Widget _buildMoveDetail(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+
+  Widget _buildOrientationCard() {
+    if (solution.orientationBaseline == null) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 40,
-            child: Text(
-              '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 12,
-              ),
-            ),
-          ),
+          const Icon(Icons.compass_calibration_rounded, color: AppColors.primary, size: 20),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              value,
-              style: const TextStyle(fontSize: 12),
+              solution.orientationBaseline!,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMoveCard(BuildContext context, Move move, int step) {
+    return Container(
+      width: 100,
+      margin: const EdgeInsets.only(right: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'STEP $step',
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 9, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            move.notation,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              move.description.toUpperCase(),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 8, fontWeight: FontWeight.bold),
             ),
           ),
         ],
