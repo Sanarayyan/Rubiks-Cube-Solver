@@ -4,7 +4,6 @@ WORKDIR /app
 
 # Copy pubspec and resolve dependencies
 COPY pubspec.yaml ./
-# Get dependencies
 RUN dart pub get
 
 # Copy source code and compile
@@ -15,9 +14,12 @@ RUN dart compile exe bin/server.dart -o bin/server
 FROM python:3.11-slim
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies + Build tools for Python C-extensions (needed for kociemba)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    gcc \
+    python3-dev \
+    libc6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python solver dependencies
