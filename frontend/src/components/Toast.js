@@ -38,7 +38,7 @@ const Toast = ({ message, type = 'info', duration = 5000, onClose }) => {
   if (!isVisible) return null;
 
   return (
-    <div className={`fixed bottom-4 sm:top-4 sm:bottom-auto right-4 left-4 sm:left-auto z-50 max-w-sm sm:w-full border rounded-lg p-4 shadow-lg transition-all duration-300 ${getStyles()} pt-safe` }>
+    <div className={`fixed top-8 sm:top-12 right-4 left-4 sm:left-auto z-[9999] max-w-sm sm:w-full border rounded-2xl p-4 shadow-2xl transition-all duration-300 ${getStyles()} pt-safe backdrop-blur-md`}>
       <div className="flex items-start gap-3">
         {getIcon()}
         <div className="flex-1">

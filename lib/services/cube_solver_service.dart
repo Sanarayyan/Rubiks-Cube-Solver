@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/cube_state.dart';
 import '../models/solution.dart';
 
@@ -7,28 +9,26 @@ class CubeSolverService {
   
   Future<Solution?> solveCube(CubeState cubeState, String mode) async {
     try {
-      // For now, return a mock solution since we don't have the backend running
-      // In production, this would make an HTTP request to your backend
-      return _generateMockSolution(cubeState, mode);
-      
-      // Uncomment this when backend is available:
-      /*
       final response = await http.post(
-        Uri.parse('$baseUrl/solve'),
+        Uri.parse('$baseUrl/api/solve'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'cubeState': cubeState.state,
+          'colors': cubeState.toColorList(),
           'mode': mode,
         }),
       );
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return Solution.fromJson(data);
+        if (data['success'] == true) {
+          return Solution.fromJson(data['solution']);
+        } else {
+          throw Exception(data['error'] ?? 'Unknown error');
+        }
       } else {
-        throw Exception('Failed to solve cube: ${response.statusCode}');
+        final data = jsonDecode(response.body);
+        throw Exception(data['details'] ?? data['error'] ?? 'Failed to solve cube: ${response.statusCode}');
       }
-      */
     } catch (e) {
       throw Exception('Error solving cube: $e');
     }

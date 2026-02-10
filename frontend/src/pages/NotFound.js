@@ -40,18 +40,18 @@ const NotFound = () => {
   const isValid = validation?.isValid || false;
 
   return (
-    <div className="min-h-screen bg-[#0D061A] text-white flex flex-col items-center justify-start p-6 font-sans relative overflow-hidden">
+    <div className="h-screen w-full bg-[#0D061A] text-white flex flex-col items-center justify-start font-sans relative overflow-hidden">
       {/* Background Glows */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/15 blur-[120px] rounded-full" />
         <div className="absolute bottom-[10%] right-[-10%] w-[60%] h-[60%] bg-blue-900/10 blur-[140px] rounded-full" />
       </div>
 
-      <div className="relative z-10 w-full max-w-md pt-10">
+      <div className="relative z-10 w-full max-w-md px-6 pt-10 pb-12 flex-1 overflow-y-auto custom-scrollbar">
         {/* Main Header Card */}
         <div className="bg-[#1F1235]/60 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl mb-8 relative">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/manual', { state: { cubeState } })}
             className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-95"
           >
             <X size={20} />
@@ -86,11 +86,17 @@ const NotFound = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            <button className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-[#F43F5E] to-[#9333EA] flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 active:scale-95 transition-all">
+            <button
+              onClick={() => navigate('/howtofix')}
+              className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-[#F43F5E] to-[#9333EA] flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 active:scale-95 transition-all"
+            >
               <AlertCircle size={18} />
               <span className="text-[10px] font-black uppercase tracking-wider">How to Fix</span>
             </button>
-            <button className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-300 text-[#1F1235] flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+            <button
+              onClick={() => navigate('/help')}
+              className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-300 text-[#1F1235] flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
+            >
               <Info size={18} />
               <span className="text-[10px] font-black uppercase tracking-wider">Help Center</span>
             </button>

@@ -16,6 +16,7 @@ void main(List<String> arguments) async {
   router.get('/', _homeHandler);
   router.post('/api/solve', _solveCubeHandler);
   router.post('/api/upload-image', _uploadImageHandler);
+  router.get('/api/history', _getHistoryHandler);
   router.get('/api/health', _healthHandler);
 
   final port = int.parse(Platform.environment['PORT'] ?? '8081');
@@ -23,6 +24,62 @@ void main(List<String> arguments) async {
 
   print('🚀 Rubik\'s Cube Backend Server running on http://localhost:$port');
   print('📊 Health check: http://localhost:$port/api/health');
+}
+
+// Global history file path
+const String historyFilePath = 'history.json';
+
+Future<void> _saveToHistory(List<String> cubeState, Map<String, dynamic> solution, String mode) async {
+  try {
+    final file = File(historyFilePath);
+    List<dynamic> history = [];
+    if (await file.exists()) {
+      final content = await file.readAsString();
+      if (content.isNotEmpty) {
+        history = jsonDecode(content);
+      }
+    }
+    
+    final newEntry = {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'created_at': DateTime.now().toIso8601String(),
+      'cube_state': cubeState,
+      'solution_moves': (solution['moves'] as List).map((m) => m['notation']).toList(),
+      'total_moves': solution['totalMoves'] ?? solution['moves'].length,
+      'estimated_time': solution['estimatedTime'] ?? (solution['moves'].length * 2),
+      'difficulty': solution['difficulty'] ?? (solution['moves'].length <= 10 ? 'Beginner' : 'Intermediate'),
+      'mode': mode,
+    };
+    
+    history.insert(0, newEntry); // Add to beginning
+    if (history.length > 50) history = history.sublist(0, 50); // Keep last 50
+    
+    await file.writeAsString(jsonEncode(history));
+  } catch (e) {
+    print('Error saving history: $e');
+  }
+}
+
+Future<Response> _getHistoryHandler(Request request) async {
+  try {
+    final file = File(historyFilePath);
+    List<dynamic> history = [];
+    if (await file.exists()) {
+      final content = await file.readAsString();
+      if (content.isNotEmpty) {
+        history = jsonDecode(content);
+      }
+    }
+    return Response.ok(
+      jsonEncode({'success': true, 'history': history}),
+      headers: {'content-type': 'application/json'},
+    );
+  } catch (e) {
+    return Response(500,
+      body: jsonEncode({'error': 'Failed to load history: $e'}),
+      headers: {'content-type': 'application/json'},
+    );
+  }
 }
 
 Response _homeHandler(Request request) {
@@ -65,8 +122,8 @@ Future<Response> _solveCubeHandler(Request request) async {
 
     final result = await _callPythonSolver(colors);
     if (result['success'] != true) {
-      return Response(500,
-          body: jsonEncode({'error': result['error'] ?? 'Failed to solve cube'}),
+      return Response.ok(
+          jsonEncode({'success': false, 'error': result['error'] ?? 'Failed to solve cube'}),
           headers: {'content-type': 'application/json'});
     }
 
@@ -76,6 +133,9 @@ Future<Response> _solveCubeHandler(Request request) async {
       final enriched = _enrichForBeginner(solution, colors);
       solution = enriched;
     }
+
+    // Save to history asynchronously
+    _saveToHistory(colors, solution, mode);
 
     return Response.ok(
       jsonEncode({'success': true, 'solution': solution}),

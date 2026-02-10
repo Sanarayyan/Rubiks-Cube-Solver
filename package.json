@@ -20,7 +20,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "android": "flutter run",
+    "ios": "flutter run -d ios",
+    "build:android": "./build_app.sh",
+    "emulator": "flutter emulators --launch Medium_Phone_API_36.1"
   },
   "eslintConfig": {
     "extends": [
@@ -41,4 +45,4 @@
     ]
   },
   "proxy": "http://localhost:8000"
-} 
+}

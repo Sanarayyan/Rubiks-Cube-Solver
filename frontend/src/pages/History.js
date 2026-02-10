@@ -24,7 +24,6 @@ const History = () => {
     try {
       const result = await cubeAPI.getHistory();
       // Format the API data or use demo data if none exists
-      const demoMoves = ["U", "R", "F", "D'", "L2", "B", "U'", "R2"];
       const mappedHistory = (result.history && result.history.length > 0)
         ? result.history.map(item => ({
           id: item.id || Math.random().toString(36).substr(2, 11),
@@ -32,19 +31,15 @@ const History = () => {
           time: item.estimated_time || 0,
           level: item.difficulty || 'Beginner',
           type: 'Solver',
-          date: item.created_at ? new Date(item.created_at).toLocaleDateString('en-GB').replace(/\//g, '-') : '13-12-2025',
+          date: item.created_at ? new Date(item.created_at).toLocaleDateString('en-GB').replace(/\//g, '-') : 'Today',
           initialState: item.cube_state || generateSolvedCube(),
-          solutionMoves: item.solution_moves || demoMoves
+          solutionMoves: item.solution_moves || []
         }))
-        : [
-          { id: '12345678910', movesCount: 8, time: 2, level: 'Beginner', type: 'Solver', date: '13-12-2025', initialState: generateSolvedCube(), solutionMoves: demoMoves },
-          { id: '12345678911', movesCount: 12, time: 14, level: 'Pro', type: 'Scanner', date: '14-12-2025', initialState: generateSolvedCube(), solutionMoves: [...demoMoves, "F", "R'", "U2", "L"] },
-          { id: '12345678912', movesCount: 8, time: 10, level: 'Beginner', type: 'Solver', date: '15-12-2025', initialState: generateSolvedCube(), solutionMoves: demoMoves },
-          { id: '12345678913', movesCount: 24, time: 32, level: 'Pro', type: 'Solver', date: '16-12-2025', initialState: generateSolvedCube(), solutionMoves: Array(24).fill("R") },
-          { id: '12345678914', movesCount: 5, time: 7, level: 'Beginner', type: 'Solver', date: '17-12-2025', initialState: generateSolvedCube(), solutionMoves: ["U", "R", "F", "L", "D"] },
-        ];
+        : [];
       setHistory(mappedHistory);
-      setActiveItem(mappedHistory[0]);
+      if (mappedHistory.length > 0) {
+        setActiveItem(mappedHistory[0]);
+      }
     } catch (error) {
       console.error('Load history error:', error);
     } finally {
@@ -129,20 +124,8 @@ const History = () => {
         <div className="absolute bottom-[10%] right-[-10%] w-[60%] h-[60%] bg-blue-900/10 blur-[140px] rounded-full" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center min-h-screen px-6 pt-12 pb-36">
-        <div className="w-full max-w-lg flex items-center justify-between mb-8">
-          <div className="bg-[#2D1B4D] p-1 rounded-2xl flex items-center shadow-inner">
-            <button className="px-6 py-2 rounded-xl text-[10px] font-black tracking-widest bg-[#E0E7FF] text-[#1E1B4B] shadow-lg">BEGINNER</button>
-            <button className="px-6 py-2 rounded-xl text-[10px] font-black tracking-widest text-slate-400 bg-transparent">PRO</button>
-          </div>
-          <div className="w-16 h-8 bg-[#E0E7FF] rounded-full p-1 flex items-center justify-end shadow-lg transition-all active:scale-95 cursor-pointer">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
-              <span className="text-xs">🌙</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="w-full max-w-md bg-[#1F1235]/60 backdrop-blur-3xl rounded-[3rem] p-6 border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] mb-8">
+      <div className="relative z-10 flex flex-col items-center h-auto px-6 pt-12 pb-48">
+        <div className="w-full max-w-md bg-[#1F1235]/60 backdrop-blur-3xl rounded-[3rem] p-6 border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.4)] mb-8 mt-12">
           <div className="relative aspect-square flex items-center justify-center mb-8">
             <div className="absolute top-0 right-0 flex gap-2 z-20">
               <button
@@ -200,7 +183,7 @@ const History = () => {
                   <div
                     key={i}
                     className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black transition-all ${i === currentMoveIndex ? 'bg-indigo-600 text-white shadow-lg scale-110' :
-                        i < currentMoveIndex ? 'bg-indigo-600/20 text-indigo-400' : 'bg-slate-800 text-slate-500'
+                      i < currentMoveIndex ? 'bg-indigo-600/20 text-indigo-400' : 'bg-slate-800 text-slate-500'
                       }`}
                   >
                     {move}

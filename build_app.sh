@@ -17,7 +17,7 @@ if command -v npm >/dev/null 2>&1; then
   pushd frontend >/dev/null
   npm ci || npm install
   # Set production API URL (change this to your actual backend URL)
-  export REACT_APP_API_URL="https://your-backend-url.com"
+  export REACT_APP_API_URL="https://your-public-backend-url.com"
   npm run build
   popd >/dev/null
 else

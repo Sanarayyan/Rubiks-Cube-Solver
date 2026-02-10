@@ -110,17 +110,11 @@ class CubeState {
       errors.add('Each face must have a different center color');
     }
     
-    // Check that stickers match their center color
-    for (int faceIndex = 0; faceIndex < 6; faceIndex++) {
-      final centerColor = getColor(faceIndex, 4);
-      for (int squareIndex = 0; squareIndex < 9; squareIndex++) {
-        final stickerColor = getColor(faceIndex, squareIndex);
-        if (stickerColor != centerColor) {
-          errors.add('Some stickers don\'t match their center colors');
-          break;
-        }
-      }
-      if (errors.isNotEmpty && errors.last.contains('Some stickers don\'t match')) {
+    // Check that stickers match the set of center colors (to ensure no alien colors)
+    final centerColorSet = centerColors.toSet();
+    for (final color in _state) {
+      if (!centerColorSet.contains(color)) {
+        errors.add('Sticker color $color is not one of the center colors');
         break;
       }
     }

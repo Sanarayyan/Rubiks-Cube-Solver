@@ -70,7 +70,7 @@ const Home = () => {
         <div className="absolute top-[20%] -right-[10%] h-[50%] w-[50%] rounded-full bg-indigo-600/20 blur-[100px] animate-float-medium" />
         <div className="absolute -bottom-[10%] left-[20%] h-[40%] w-[40%] rounded-full bg-purple-600/15 blur-[110px] animate-float-fast" />
         <div className="absolute top-[50%] left-[10%] h-[30%] w-[30%] rounded-full bg-emerald-600/10 blur-[80px] animate-float-slow" />
-        
+
         {/* Noise/Grain Texture Overlay */}
         <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] filter contrast-150 brightness-100" />
       </div>
@@ -86,16 +86,16 @@ const Home = () => {
               </span>
               <span className="text-xs font-bold tracking-[0.2em] text-blue-400 uppercase">AI Powered Solver</span>
             </div>
-            
+
             <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tight">
               MASTER THE <br />
               <span className="bg-gradient-to-b from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent">CUBE</span>
             </h1>
-            
+
             <p className="text-lg md:text-2xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
               Experience the future of Rubik's solving. Styled, step-by-step algorithms delivered with precision.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Link
                 to="/manual"
@@ -105,7 +105,7 @@ const Home = () => {
                 <Palette className="mr-3 h-6 w-6 group-hover:rotate-12 transition-transform" />
                 GET STARTED
               </Link>
-              
+
               <button className="px-8 py-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-bold hover:bg-slate-800 transition-colors">
                 LEARN MORE
               </button>
@@ -113,14 +113,21 @@ const Home = () => {
           </div>
 
           {/* 3D Cube Preview with Glassmorphic Container */}
-          <div className="mt-20 flex justify-center perspective-[2000px]">
-            <div className="relative w-full max-w-3xl aspect-video rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden bg-slate-900/40 backdrop-blur-2xl ring-1 ring-white/10 group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-transparent to-purple-500/5 opacity-50" />
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-30">
-                {[...Array(3)].map((_, i) => <div key={i} className="w-1.5 h-1.5 rounded-full bg-white" />)}
+          <div className="mt-8 flex justify-center perspective-[2500px] px-2 sm:px-4">
+            <div className="relative w-full max-w-4xl aspect-square sm:aspect-video rounded-[3rem] shadow-[0_60px_120px_-30px_rgba(0,0,0,0.7)] overflow-hidden bg-slate-900/10 backdrop-blur-3xl ring-1 ring-white/10 group group-hover:ring-blue-500/40 transition-all duration-700">
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-transparent to-purple-500/20 opacity-60" />
+
+              <div className="absolute top-10 left-1/2 -translate-x-1/2 flex gap-3 opacity-50">
+                {[...Array(3)].map((_, i) => <div key={i} className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.6)]" />)}
               </div>
-              <div className="absolute inset-0 flex items-center justify-center">
+
+              <div className="absolute inset-0 flex items-center justify-center transform scale-[1.25] sm:scale-[1.5] transition-transform duration-1000 group-hover:scale-[1.6]">
                 <Cube3D cubeState={previewState} autoRotate={true} />
+              </div>
+
+              {/* Floating Badge */}
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-white/5 backdrop-blur-2xl border border-white/10 px-8 py-3 rounded-full text-[11px] font-black tracking-[0.4em] text-white/50 uppercase">
+                Interactive Preview
               </div>
             </div>
           </div>
@@ -134,7 +141,7 @@ const Home = () => {
             <h2 className="text-3xl font-bold text-white tracking-tight">SOLVER MODES</h2>
             <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8" />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {actions.map((action, index) => {
               const Icon = action.icon;
@@ -147,11 +154,11 @@ const Home = () => {
                   <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
                     <Icon size={120} />
                   </div>
-                  
+
                   <div className={`flex-shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center mr-8 ${getColorClasses(action.color)} shadow-2xl group-hover:scale-110 transition-transform`}>
                     <Icon size={32} />
                   </div>
-                  
+
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
                       {action.title}
@@ -174,7 +181,7 @@ const Home = () => {
             <h2 className="text-sm font-bold tracking-[0.3em] text-indigo-400 uppercase mb-4">Core Capabilities</h2>
             <h3 className="text-4xl md:text-5xl font-extrabold text-white">ENGINEERED FOR SPEED</h3>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;

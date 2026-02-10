@@ -10,7 +10,7 @@ class CubeProvider extends ChangeNotifier {
   Solution? _solution;
   bool _isLoading = false;
   String _mode = 'fast'; // 'fast' or 'beginner'
-  String _inputMode = 'grid'; // 'grid', 'net', '3d'
+  String _inputMode = '3d'; // 'grid', 'net', '3d'
   
   // Getters
   CubeState get cubeState => _cubeState;

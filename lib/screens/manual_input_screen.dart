@@ -18,13 +18,6 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text('CONFIGURE CUBE'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: Stack(
         children: [
           const BoxDecoration(gradient: AppColors.backgroundGradient).build(context),
@@ -138,14 +131,8 @@ class _ManualInputScreenState extends State<ManualInputScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildMiniToggle(
-                    'MODE',
-                    ['FAST', 'BEGINNER'],
-                    cubeProvider.mode == 'fast' ? 0 : 1,
-                    (idx) => cubeProvider.setMode(idx == 0 ? 'fast' : 'beginner'),
-                  ),
                   _buildMiniToggle(
                     'VIEW',
                     ['GRID', 'NET', '3D'],
