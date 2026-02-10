@@ -10,7 +10,7 @@ node_modules
 .dart_tool
 build
 .packages
-pubspec.lock
+# pubspec.lock (removed from ignore to allow Docker COPY)
 
 # Python
 __pycache__
