@@ -1,17 +1,21 @@
-# Multi-stage: build Dart deps, then run with Python
-
+# Stage 1: Build Dart deps
 FROM dart:stable AS dart-deps
 WORKDIR /app
 COPY pubspec.yaml pubspec.lock ./
 RUN dart pub get --offline || dart pub get
 
+# Stage 2: Runtime image with Python and Dart
 FROM python:3.11-slim AS runtime
-# Install minimal tools for Dart runtime
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates unzip && rm -rf /var/lib/apt/lists/*
 
-# Install Dart SDK (stable)
-RUN curl -fsSL https://storage.googleapis.com/dart-archive/channels/stable/release/latest/linux_packages/dart_amd64.deb -o /tmp/dart.deb \
-  && apt-get update && apt-get install -y /tmp/dart.deb && rm -f /tmp/dart.deb
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Dart SDK from the dart-deps stage (which is based on dart:stable)
+COPY --from=dart-deps /usr/lib/dart /usr/lib/dart
+ENV PATH="/usr/lib/dart/bin:${PATH}"
 
 WORKDIR /app
 
