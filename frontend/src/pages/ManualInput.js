@@ -112,7 +112,7 @@ const ManualInput = () => {
             console.error('Solve cube error:', error);
             const isNetworkError = !error.response;
             if (isNetworkError) {
-                showError(`Server Unreachable: Make sure the backend solver is running on port 8081.`);
+                showError(`Server Unreachable: Please check your internet connection and ensure the backend is live.`);
             } else {
                 const errorMsg = error.response?.data?.error || error.message || 'Server error occurred';
                 showError(`Solve Failed: ${errorMsg}`);

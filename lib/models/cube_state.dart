@@ -55,6 +55,9 @@ class CubeState {
   }
   
   // Get the entire state as a list
+  List<String> toColorList() => List.from(_state);
+
+  // Get the entire state as a list (unmodifiable)
   List<String> get state => List.unmodifiable(_state);
   
   // Get state for a specific face

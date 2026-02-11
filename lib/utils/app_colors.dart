@@ -40,7 +40,7 @@ class AppColors {
   static const LinearGradient glassGradient = LinearGradient(
     colors: [
       Colors.white10,
-      Colors.white05,
+      Color(0x0DFFFFFF), // 5% opacity white
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

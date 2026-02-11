@@ -5,7 +5,7 @@ import '../models/cube_state.dart';
 import '../models/solution.dart';
 
 class CubeSolverService {
-  static const String baseUrl = 'http://localhost:8081'; // Backend URL
+  static const String baseUrl = 'https://rubiks-cube-solver-3rur.onrender.com'; // Backend URL
   
   Future<Solution?> solveCube(CubeState cubeState, String mode) async {
     try {

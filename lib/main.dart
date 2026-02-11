@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'providers/cube_provider.dart';
-import 'screens/splash_screen.dart';
-import 'utils/app_theme.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'dart:convert';
+import 'dart:io';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +14,10 @@ void main() {
     DeviceOrientation.portraitDown,
   ]);
   
-  // Set system UI overlay style
+  // Transparent status bar
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarIconBrightness: Brightness.light,
   ));
   
   runApp(const RubiksCubeSolverApp());
@@ -30,15 +28,105 @@ class RubiksCubeSolverApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => CubeProvider()),
-      ],
-      child: MaterialApp(
-        title: 'Rubik\'s Cube Solver',
-        theme: AppTheme.darkTheme,
-        home: const SplashScreen(),
-        debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      title: 'Rubik\'s Cube Solver',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // Matches React bg
+      ),
+      home: const WebViewContainer(),
+    );
+  }
+}
+
+class WebViewContainer extends StatefulWidget {
+  const WebViewContainer({super.key});
+
+  @override
+  State<WebViewContainer> createState() => _WebViewContainerState();
+}
+
+class _WebViewContainerState extends State<WebViewContainer> {
+  late final WebViewController _controller;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0xFF0F172A))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onWebResourceError: (WebResourceError error) {
+            debugPrint('WebView Error: ${error.description}');
+          },
+          onPageFinished: (String url) {
+            setState(() {
+              _isLoading = false;
+            });
+          },
+        ),
+      );
+
+    // Platform-specific configuration
+    if (_controller.platform is AndroidWebViewController) {
+      AndroidWebViewController.enableDebugging(true);
+      (_controller.platform as AndroidWebViewController)
+          .setMediaPlaybackRequiresUserGesture(false);
+    }
+
+
+    _loadStaticFiles();
+  }
+
+  Future<void> _loadStaticFiles() async {
+    try {
+      // Load the index.html from bundled assets
+      final String htmlContent = await rootBundle.loadString('assets/www/index.html');
+      
+      // We load via local server simulation (file schema)
+      // This is necessary because CRA uses absolute paths for static assets (/static/js/...)
+      // which won't resolve correctly if we just load the HTML string.
+      // However, for Flutter WebView, we can point the base URL to assets/www/
+      
+      _controller.loadFlutterAsset('assets/www/index.html');
+    } catch (e) {
+      debugPrint('Error loading webview assets: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // We use a WillPopScope (or PopScope in newer versions) to handle back gestures in React
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop) return;
+          if (await _controller.canGoBack()) {
+            _controller.goBack();
+          } else {
+            // Exit app
+            SystemNavigator.pop();
+          }
+        },
+        child: SafeArea(
+          bottom: false, // React handles the bottom safe area usually
+          child: Stack(
+            children: [
+              WebViewWidget(controller: _controller),
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF38BDF8),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
